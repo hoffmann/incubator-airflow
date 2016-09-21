@@ -18,6 +18,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import logging
+import logging.config
+import json
 import os
 import sys
 
@@ -112,10 +114,13 @@ def policy(task_instance):
     pass
 
 
-def configure_logging(log_format=LOG_FORMAT):
+def configure_logging(log_format=LOG_FORMAT, log_cfg=None):
     logging.root.handlers = []
-    logging.basicConfig(
-        format=log_format, stream=sys.stdout, level=LOGGING_LEVEL)
+    if log_cfg:
+        logging.config.dictConfig(json.load(open(log_cfg)))
+    else:
+        logging.basicConfig(
+            format=log_format, stream=sys.stdout, level=LOGGING_LEVEL)
 
 engine = None
 Session = None
@@ -141,5 +146,5 @@ try:
 except:
     pass
 
-configure_logging()
+configure_logging(log_cfg=conf.get("logging", "filename"))
 configure_orm()
